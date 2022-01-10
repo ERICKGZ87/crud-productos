@@ -1,0 +1,20 @@
+
+.correcto{
+
+    border-color: green;
+}
+.error{
+
+    border-color: red;
+}
+
+.msjBien{
+
+    color:green;
+}
+
+.msjError{
+
+    color:red
+}
+
