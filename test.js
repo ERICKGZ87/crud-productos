@@ -1,6 +1,7 @@
 // variables
 let data=[]
 const formulario = document.querySelector("#form");
+console.log("🚀 ~ file: test.js ~ line 4 ~ formulario", formulario)
 const form = document.querySelectorAll("form input");
 const BotonAgregar = document.querySelector(".btn");
 const tabla = document.querySelector("tbody");
@@ -40,13 +41,14 @@ function Listener() {
 
   unidadMedida.addEventListener("blur", (e) => {
     if (e.target.value !== "") {
+
       e.target.classList.add("correcto");
-      msjCorrecto("Esta correcto", 4);
-      setTimeout(function () {
-       limpiarMsj(unidadMedida, 4);
-      }, 3000);
+      items.MostrarMensajes("Has seleccionado una unidad de medida","msjBien",e)
+
     }else{
-      msjError("no puede estar vacio",4)
+      e.target.classList.add("error");
+      items.MostrarMensajes("No puede estar vacio","Error",e)
+      
     }
   });
  
@@ -75,7 +77,7 @@ InyectarHtml(data);
 }
 function ValidarGeneral(e) {
 
-  ValidarCampos(e, "articulo",RexNOmbre,"Esta correcto","no es correcto",1); //articulo
+  ValidarCampos(e, "articulo",RexNOmbre,"Esta correcto el Articulo !","no es correcto el items !",1,); //articulo
   ValidarCampos(e, "stock-minimo",rgAmount,"Esta correcto","no es correcto",2); //stock minimo
   ValidarCampos(e, "Saldo",rgAmount,"Esta correcto","no es correcto",3); //Saldo
   //ValidarCampos(e, "unidadMedida",e.target.value !=="","Esta correcto","no es correcto",4); //unidadMedida
@@ -89,32 +91,54 @@ function ValidarCampos(ev, clase,condicion,mensajeOK,mensajeError,n) {
     if (condicion.test(ev.target.value)) {
       ev.target.classList.remove("error");
       ev.target.classList.add("correcto");
-    msjCorrecto(mensajeOK,n)
 
-    setTimeout(function() {
-        limpiarMsj(articul,1)
-        limpiarMsj(stockMinimo,2)
-        limpiarMsj(saldo,3)
-        limpiarMsj(Bodega,5)
-        limpiarMsj(Observacion,6)
-    },3000)
+   items.MostrarMensajes(mensajeOK,"msjBien",ev)
+
     } else {
 
       ev.target.classList.remove("correcto");
       ev.target.classList.add("error");
-      msjError(mensajeError,n)
+   
 
-      setTimeout(function() {
-        limpiarMsj(articul,1)
-        limpiarMsj(stockMinimo,2)
-        limpiarMsj(saldo,3)
-        limpiarMsj(unidadMedida,4)
-        limpiarMsj(Bodega,5)
-        limpiarMsj(Observacion,6)
-    },3000)
+      items.MostrarMensajes(mensajeError,"Error",ev)
     }
   }
 }
+Producto.prototype.MostrarMensajes=(Mensaje,tipo,ev)=>{
+  const Divv=document.createElement("div")
+
+if(tipo==="msjBien"){
+  Divv.classList.add("msjBien")
+  Divv.textContent=Mensaje
+//formulario.insertBefore(Divv,document.querySelector(ref))
+const DivvNUmero=document.querySelectorAll(".msjBien")
+
+if(DivvNUmero.length===0){
+  formulario.appendChild(Divv)
+}
+
+
+}else if(tipo==="Error"){
+
+  Divv.classList.add("Error")
+  Divv.textContent=Mensaje
+  //formulario.insertBefore(Divv,document.querySelector(ref))
+  const DivvNU=document.querySelectorAll(".Error")
+ 
+
+if(DivvNU.length===0){
+  formulario.appendChild(Divv)
+}
+
+}
+setTimeout(function() {
+  Divv.remove()
+  ev.target.classList.remove("error");
+  ev.target.classList.remove("correcto");
+},2000)
+}
+
+
 
 function msjCorrecto(msj,n){
 
@@ -158,16 +182,13 @@ console.log("🚀 ~ file: test.js ~ line 148 ~ data", data)
 InyectarHtml(data)
 SincronizarST()
 formulario.reset();
+
+items.MostrarMensajes("Has agregado un item !","msjBien")
 }else if(existe){
-  msjError("Ya existe el articulo.", 7);
-    setTimeout(function() {
-      limpiarMsj(BotonAgregar,7)
-  },3000)
+  items.MostrarMensajes("Ya existe el articulo.","Error")
+ 
 }else{
-  msjError("Son obligatorios todos los campos.", 7);
-  setTimeout(function() {
-    limpiarMsj(BotonAgregar,7)
-},3000)
+  items.MostrarMensajes("Son obligatorios todos los campos.","Error")
 
 }
 }
@@ -180,7 +201,7 @@ if(e.target.classList.contains("Editar")){
     articul.value == "" &&
     stockMinimo.value == "" &&
     saldo.value == "" &&
-    unidadMedida.value !== "" &&
+    unidadMedida.value == "" &&
     Bodega.value == "" &&
     Observacion.value == ""
   ){
@@ -205,10 +226,11 @@ if(e.target.classList.contains("Editar")){
       saldo.value !== "" &&
       Bodega.value !== "" &&
       Observacion.value !== "" &&
-      unidadMedida.value !== ""
-      //existeName == false
+      unidadMedida.value !== "" &&
+      existeName == false
     ) {
       const Nuevadataa = data.map((c) => {
+        console.log("desde map")
         tabla.innerHTML=""
         if (c.id === IdItems) {
           c.articulo = articul.value;
@@ -217,10 +239,6 @@ if(e.target.classList.contains("Editar")){
           c.unidadmedida = unidadMedida.value;
           c.bodega = Bodega.value;
           c.observacion = Observacion.value;
-          msjCorrecto("se edito el articulo",7)
-          setTimeout(function() {
-            limpiarMsj(BotonAgregar,7)
-        },3000)
           return c;
 
         } else {
@@ -229,11 +247,15 @@ if(e.target.classList.contains("Editar")){
       });
       data = [...Nuevadataa];
       InyectarHtml(data);
+      items.MostrarMensajes("Has Editado un item !","msjBien")
 
       console.log("nueva data", Nuevadataa);
       console.log("data", data);
+      formulario.reset();
+      BotonAgregar.disabled = false;
     }
   }
+
   SincronizarST()
 
 }
@@ -243,10 +265,7 @@ Producto.prototype.BorrarData=function (e){
   if (e.target.classList.contains("borrar")) {
    data=data.filter((d)=>d.id !==IdItems)
    InyectarHtml(data)
-   msjCorrecto("se elimino el articulo",7)
-   setTimeout(function() {
-    limpiarMsj(BotonAgregar,7)
-},3000)
+   items.MostrarMensajes("Has Eliminado un item !","msjBien")
   }
   SincronizarST()
 
